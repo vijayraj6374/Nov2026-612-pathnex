@@ -1,5 +1,15 @@
-2 hr for coding practice 
-1 hr evening class prepartion
-2 hr upcoming class 
-1 hr english movies
 
+#Ansible Task -Install Nginx on Pathnex server
+- name: Install Nnginx on Pathnex server
+hosts: allbecome: yes 
+tasks:
+- name:nginxyum:
+name:nginxstate: present
+
+@Docker
+#Ddocker Installation & First Container
+docker --versiondocker run ubuntu echo "Hello Pathnex"
+
+#docker File
+FROM ubantu:22.04
+CMD["echo","Hello"]
