@@ -1,0 +1,110 @@
+
+## Ansible -Install & Enable Nginx
+---
+- name: Install and start Nginx on pathnex
+hosts: all becomes: yes
+tasks:
+- name:Install nginx yum:
+name: nginxstate: prasent
+- name:Enable nginxservice:
+name: nginx
+state:present
+enable: yes
+
+## Terraform -EC2 with Tags (r5.2xlarge)
+provider "aws"{
+    region = "us-east-1"
+}
+resource "aws_instance" "PathnexEC2"
+{
+    ami = "ami-0abcd1234abcd1234"
+    instance_type = "r5.2xlarge"
+    tags{
+        Name = "Pathnex-Server"
+        Environment = "Training"
+        Owner = "PathnexStudent"
+    
+    }
+}
+## kubernates -deployment with two Replicas
+app apiVersion : appV1
+Kind: deployment
+metadata:
+name: Pathnex-deployment
+spec:
+replicas: 2
+selector
+matchLabels:
+app : pathnex-app
+template:
+metadata:
+labels:
+app : pathnex-app
+spec:
+containers:
+-name:appimage: nginxports:
+-containerPort: 80
+## Shell Script -Desk Usage
+#!/bin/bash
+df -h
+
+## Maven  Build
+# Jenkins pipeline -maven Build
+you will learn how to ** compaile,test and package a java project** us
+
+pipeline{
+    agent any
+    tools{
+        maven 'maven-3.8.1'
+        jdk 'jdk-17
+    }
+}
+stages{
+    stage('checkout'){
+        steps{
+git url: 'https://github.com/pathnex/sample-java-app.git'
+        }
+    }
+    stage('compile')
+    {
+        steps
+        {
+            sh 'mvn clean compile'
+        }
+    }
+    stage('test'){
+        steps{
+            sh 'mvn test'
+        }
+    }
+    stage('package'){
+        steps{
+            sh 'mvn package'
+        }
+    }
+}
+
+    # GitLab CI -maven Build
+    stages:
+    -build
+    -test
+    -package
+    maven-build
+    stage: build
+    image: maven:3.8.1-jdk-17
+    script:
+    -git clone https://github.com/Pathnex/sample-java-app.git
+    -cd sample-java-app
+    -mvn clean compaile
+    maven-test
+    stage: test
+    image: maven:3.8.1-jdk-17
+    script
+    -cd sample-java-app
+    -mvn test
+    maven-package
+    stage:package
+    image: maven:3.8.1-jdk-17
+    script:
+    -cd sample-java-app
+    -mvn package    
