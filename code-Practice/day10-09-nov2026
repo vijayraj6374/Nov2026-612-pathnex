@@ -1,0 +1,105 @@
+
+        ## Ansible - Install Multiple Packages
+        --- 
+        - name: Iinstall packages for pathnex
+        hosts: all
+        become:yes
+        tasks:
+        - name:Install tolls
+        yum:
+        name:
+        - git
+        - wget
+      state: present
+
+## terraform -EC2 with Key Pair(c6i.8xlarge)
+provider "aws"{
+    region = "us-east-1"
+}
+resource "aws_key_pair" "PathnexKey"{
+    key_name = "PathexKkey"
+    public_key = "ssh-rsa AAAA..."
+}
+resource "aws_instance" "PpathnexEC2"{
+    ami = "ami-0abcd1234abcd1234"
+    instance_type = "c6i.8xlarge"
+    key_name = awk_key_pair.PathnexKey.key_name
+    tags={
+        Name = "Pathnex-Ec2"
+    }
+}
+## Kubernetes -Create ClusterIp Service
+apiVersion:v1
+kind:Service
+metadata:
+name: pathnex-service
+spec:
+selector:
+app: pathnex-app
+ports:
+- port: 80
+targetPort:8 0
+
+# Parallel Builds
+## 🔹 Jenkins Pipeline — Parallel Build & Test
+You will learn how to **run build and test in parallel**.
+
+pipeline {
+    agent any
+    stages {
+        stage('Parallel Tasks') {
+            parallel {
+                stage('Build') {
+                    steps {
+                        sh 'mvn clean compile'
+                    }
+                }
+                stage('Test') {
+                    steps {
+                        sh 'mvn test'
+                    }
+                }
+            }
+        }
+    }
+}
+# Parallel Bbuilds
+## Jenkins Pipeline -Parallel Build & Test
+pipeline{
+    agent any
+    stages{
+        stage('parallel task')
+        Parallel{
+            stage('build')
+            {
+                steps{
+                    sh 'maven clean compile'
+                }
+            }
+            stage('test'){
+                steps{
+                sh 'maven test'
+            }
+        }
+    }
+}
+}
+  # Parallel Builds 
+  # GitLab CI - Parallel Jobs
+  you will learn how to ** run parallel job in gitlab CI **.
+  stages:
+  - build-test
+  mavan build:
+  stage:build-test
+  image:mavan :3.8.1-jdk-17
+  script:
+  - git clone https://github.com/pathnex/sample-java-app.git
+  -cd sample-java-app
+  -mvn clen compile
+  parallel:1
+  maven-test:
+  image:maven:3.8.1.jdk-17
+  script:
+  -cd sample-java-app
+  -cd mvn test
+  parallel:1
