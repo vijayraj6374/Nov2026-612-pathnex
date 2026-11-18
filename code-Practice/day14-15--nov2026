@@ -1,0 +1,160 @@
+
+## Ansible - Iinstall package using the variables
+---
+- name : Install package for pathnex using the variables
+hosts: all
+become:yes
+vars: 
+-pathnex_packages
+-tree
+-vim
+-unzip
+tasks:
+- name: Install required package
+yum:
+name: "{{pathnex_package}}"
+state:present
+## Terraform -Create the vpc+subnet
+provider "aws"{
+resion = "us-east-1"
+}
+resource "aws-vpc" "PathnexVpc"
+{
+    cidr_block = "10.10.0.0/16"
+    tags{
+        Name = "Pathnex-Vpc"
+    }
+}
+resource "aws-subnet" "PathnexSubnet"
+{
+    vpc_id= "aws_vpc.Pathnex_Vpc.id"
+cidr_block = " "10.10.1.0/24"
+map_public-ip-on-lunch = true
+tags{
+    Name = "Pathnex_Subnet"
+}
+}
+## kubernets - add Liveness & Readness probes
+appVersion:V1
+kind: pod
+metadata:
+name:pathnex_probe-pod
+spec:
+containers:
+-name:web
+image: nginx
+LivenessProbes:
+httpGet:
+path: /
+port:80
+initialDelaySeconds:5
+readinessProbe:
+httpGet:
+path : /
+port:80
+initialDelaySeconds: 3
+## shell Script -loop Through List
+#!/bin/bash
+for item in pathnex devops Training; do
+echo "Item:&item"
+done
+
+# Conditional Stages
+
+## 🔹 Jenkins Pipeline — Conditional Execution
+You will learn how to **run stages based on branch or parameter conditions**.
+
+pipeline {
+    agent any
+    parameters {
+        string(name: 'ENVIRONMENT', defaultValue: 'dev', description: 'Deployment Environment')
+    }
+    environment {
+        INSTITUTE_NAME = "Pathnex"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Pathnex/sample-java-app.git'
+            }
+        }
+        stage('Build') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+        stage('Deploy') {
+            when {
+                expression { params.ENVIRONMENT == 'dev' }
+            }
+            steps {
+                sh 'echo "Deploying to $ENVIRONMENT by $INSTITUTE_NAME"'
+            }
+        }
+    }
+}
+# Conditional Stages
+## Jenkins pipeline -Conditional Execution
+you will learn how **to run based on branch or parameter condition**
+pipeline{
+    agent any
+    parameter{
+        string (name:Enviroment, DefaultValus: 'dev', Description: 'deployment Enviroment')
+    }
+}
+enviroment{
+    Insititue_Name = "Pathnex"
+}
+stages{
+    stage('checkout')
+    {
+        step{
+            git branch : 'main' url:'https://github.com/Pathnex/sample-java-app.git'
+        }
+    }
+    stage('builds'){
+        when{
+            branch 'main'
+
+        }
+        steps{
+            sh 'mvn clean compail'
+        }
+    }
+    stage('deploy'){
+        when{
+         expression { params.ENVIRONMENT == 'dev' }
+        
+         
+        }
+        steps{
+            sh 'echo " deploying to $enviroment by $institute_name"' 
+        }
+    }
+}
+## GitLab CI - Conditional Jobs
+you will lean how to ** run job based on variables or branches**.
+stages:
+- build
+- deploy
+build:
+  stage: build
+  image: maven:3.8.1-jdk-17
+  script:
+    - git clone https://github.com/Pathnex/sample-java-app.git
+    - cd sample-java-app
+    - mvn clean compile
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - echo "Deploying to $CI_ENVIRONMENT_NAME by Pathnex"
+  only:
+    variables:
+      - $CI_ENVIRONMENT_NAME == "dev"
