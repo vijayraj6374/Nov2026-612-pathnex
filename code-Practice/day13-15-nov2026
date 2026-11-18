@@ -1,0 +1,129 @@
+    ---
+     -Name: Install  and configure the Nginx
+       hosts : webservers
+       become: yes
+       task:
+       - name: Install the Nnginex on Amazon Linux
+        package:
+        name:nginx
+        state:present
+        when:ansible_os_family=="Redhat"
+        -name:Start and enable Nginx service
+        service:
+        name: nginx
+        state: started
+        enable:yes
+## Terraform: EC2 (choose any Pathnex instance)
+# Get default VPC
+data "aws_vpc" "default"
+{
+  default = true
+}
+
+# Get available subnets
+data "aws_subnects""default"{
+  filter{
+    name = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+# Get latest Amazon Linux 2023 AMI
+
+data "aws_ssm_parameter" "ami"{
+  name = "/ aws/service/ami-amazon-linex-latest/al2023-ami-kernel-default-x86-64"
+}
+
+# Create Security Group
+resource "aws-aws_security_group" "pathnex-sg"{
+  name = "pathnex-EC2-SG"
+  description = "Security group for pathnex EC2"
+  vpc_id = data.aws_vpc.default.id
+}
+  # SSH access
+ingress {
+  description ="SSH access"
+  from_port =22
+  to_port = 22
+  protocol = "tcp"
+  cidr-blocks = [var.admin_cidr]
+}
+  # HTTP access
+ingress{
+  description = "HTTP access"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+cidr-block = ["0.0.0.0/0"]
+}
+  # Outbound traffic
+  egress{
+  from_port = 0
+  to_port = 0
+  protocol = 0
+  codr_blocks = ["0.0.0.0/0"]
+
+tags = {
+  Name ="Pathnex-SG"
+  Environment = "Dev"
+  }
+}
+
+
+# Create EC2 Instance
+resource "aws_instance" "pathnex_ec2" {
+  ami                         = data.aws_ssm_parameter.ami.value
+  instance_type               = var.instance_type
+  key_name                    = var.key_name
+  subnet_id                   = data.aws_subnets.default.ids[0]
+  vpc_security_group_ids      = [aws_security_group.pathnex_sg.id]
+  associate_public_ip_address = true
+
+  root_block_device {
+    volume_size = 8
+    volume_type = "gp3"
+    encrypted   = true
+  }
+
+  tags = {
+    Name        = "${var.project_name}-EC2"
+    Environment = "Dev"
+    ManagedBy   = "Terraform"
+  }
+}
+
+## Kubernetes: Deployment 2 replicas
+
+
+            apiVersion v1
+            kind: Deployment
+            metadata:
+            name : pathnex-nginx
+            labels :
+            app : pathnex
+            spec:
+             replicas: 2
+             selector
+             matchLabels:
+             app : pathnex
+             template:
+             metadata:
+               labels:
+               app: pathnex
+            spec:
+          containers:
+        name:nginx
+         image:nginx:latest
+           ports:
+            containerPort:80
+
+    ##Shell: Print date + uptime
+    #!/bin/bash
+echo "=============================="
+echo " SYSTEM INFORMATION"
+echo "=============================="
+echo "Current data and time:"
+date 
+echo "---------------------"
+echo "server uptime"
+uptime
+echo  "-----------------------------"
