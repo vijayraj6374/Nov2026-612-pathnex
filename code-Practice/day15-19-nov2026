@@ -1,0 +1,69 @@
+## Ansible - use Jinja2 template
+---
+- name: Deploy template for pathnex
+hosts: all
+become: yes
+tasks:
+-name: copy template file
+template:
+src:pathnex.conf.j2
+dest: /etc/pathnex.conf
+
+## Terraform - Insternet Gateway
+resource "aws_internet_gateway" "PathnexIGW"{
+    vpc_id = aws_vpc.PathnexVPC.id
+    tags{
+        Name="Pathnex-IGW"
+    }
+}
+## Kubernates - Create configMap
+apiVersion: v1
+kind:ConfigMmap
+metadata:
+name: pathnex-config
+data:
+APP_MODE: "Hello pathnex"
+
+## Shell Script -check the cup load
+#!/bin/bash
+LOAD=$(uptime | awk '{print$10}')
+echo "Currant CPU LOAD:$LOAD"
+
+# Artifacts and Archiving
+## Jenkins Pipeline -Archive Artifacts
+you will learn how **to build the save artifacts for future use**
+pipeline{
+    agent any
+    stages{
+        stage('checkout'){
+            steps{
+                 git url:https://github.com/pathnex/sample-java-app.git' 
+            }
+        }
+        stage('Build){
+            steps{
+                sh 'mvn clean package'
+            }
+        }
+        stage('Aarchiv')
+        {
+            steps{
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+    }
+}
+##  Gitlab CI - Artifacts
+stages:
+-build
+build:
+stage: build
+image:maven:3.8.1.-jdk-17
+script:
+-git clone https://github.com/pathnex/sample-java-app.git
+-cd sample-java-app
+-mvn clean package
+artifacts:
+paths:
+-target/*.jar
+expire_in: 1
